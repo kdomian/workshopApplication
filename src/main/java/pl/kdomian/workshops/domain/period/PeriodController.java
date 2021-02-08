@@ -1,23 +1,23 @@
 package pl.kdomian.workshops.domain.period;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/eventPeriod")
 class PeriodController {
 
-    @DeleteMapping("/eventPeriod/{id}")
+    PeriodFacade periodFacade;
+
+    @DeleteMapping("/{id}")
     void deleteEventPeriod(@PathVariable String id) {
         throw new IllegalArgumentException("Not implemented yet");
     }
 
-    @PutMapping("/eventPeriod/")
+    @PutMapping("/")
     Period editEventPeriod(Period eventPeriod) {
         throw new IllegalArgumentException("Not implemented yet");
     }
@@ -25,4 +25,5 @@ class PeriodController {
     public List<Period> getEventPeriods(Long id) {
         throw new IllegalArgumentException("Not implemented yet");
     }
+
 }

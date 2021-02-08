@@ -31,6 +31,7 @@ class Period {
                 .name(name)
                 .startDate(startDate)
                 .endDate(endDate)
+                .simpleEventEntity(simpleEventEntity)
                 .build();
     }
 

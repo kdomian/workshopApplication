@@ -19,20 +19,20 @@ public class PeriodFacade {
     private final PeriodRepository periodRepository;
     private final PeriodFactory periodFactory;
 
-    public PeriodDTO save(PeriodDTO periodDTO, SimpleEventEntity simpleEventEntity) {
-        if (periodDTO.getEndDate().isAfter(simpleEventEntity.getStartDate())) {
+    public PeriodDTO save(PeriodDTO periodDTO) {
+        if (periodDTO.getEndDate().isAfter(periodDTO.getSimpleEventEntity().getStartDate())) {
             throw new BusinessException("New event period could not finish after event start date");
         }
-        Period newPeriod = periodFactory.from(periodDTO, simpleEventEntity);
+        Period newPeriod = periodFactory.from(periodDTO);
         newPeriod.validateStartEndDatePeriod();
-        periodRepository.findAllBySimpleEventEntity(simpleEventEntity).stream()
+        periodRepository.findAllBySimpleEventEntity(newPeriod.getSimpleEventEntity()).stream()
                 .noneMatch(period -> !period.validateCorectPeriodSeparable(newPeriod) || !period.validatePeriodName(newPeriod));
         return periodRepository.save(newPeriod).toDto();
 
     }
 
-    public void delete(PeriodDTO periodDTO, SimpleEventEntity simpleEventEntity) {
-        periodRepository.delete(periodFactory.from(periodDTO, simpleEventEntity));
+    public void delete(PeriodDTO periodDTO) {
+        periodRepository.delete(periodFactory.from(periodDTO));
     }
 
     public List<PeriodDTO> getPeriodsByEventId(SimpleEventEntity simpleEventEntity) {

@@ -60,11 +60,13 @@ public class EventFacade {
     }
 
     public PeriodDTO addPeriodToEvent(Long eventId, @Valid PeriodDTO periodDTO) {
-        return periodFacade.save(periodDTO, getEvent(eventId).toSimpleEventEnityt());
+        periodDTO.setSimpleEventEntity(getEvent(eventId).toSimpleEventEnityt());
+        return periodFacade.save(periodDTO);
     }
 
     public void deletePeriodFromEvent(Long eventId, PeriodDTO periodDTO) {
-        periodFacade.delete(periodDTO, getEvent(eventId).toSimpleEventEnityt());
+        periodDTO.setSimpleEventEntity(getEvent(eventId).toSimpleEventEnityt());
+        periodFacade.delete(periodDTO);
     }
 
     public List<PeriodDTO> getEventPeriods(Long eventId) {
