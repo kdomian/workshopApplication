@@ -38,7 +38,6 @@ class PeriodFacadeTest {
         periodDTOS = new ArrayList<>();
         periodFactory = new PeriodFactory();
         periodFacade = Mockito.spy(new PeriodFacade(periodRepository, periodFactory));
-        when(event.getStartDate()).thenReturn(now.plusDays(5L));
 
 
     }
@@ -52,7 +51,7 @@ class PeriodFacadeTest {
         //Given
         initPeriodHintsTests();
         //When
-        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event);
+        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event, now.plusDays(5L));
         //Then
         assertEquals(1, periodHints.size());
         assertEquals(now, periodHints.get(0).getStartDate());
@@ -65,7 +64,7 @@ class PeriodFacadeTest {
         initPeriodHintsTests();
         periodDTOS.add(PeriodDTO.builder().startDate(now.minusDays(2L)).endDate(now.plusDays(5L)).build());
         //When
-        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event);
+        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event, now.plusDays(5L));
         //Then
         assertEquals(0, periodHints.size());
     }
@@ -76,7 +75,7 @@ class PeriodFacadeTest {
         initPeriodHintsTests();
         periodDTOS.add(PeriodDTO.builder().startDate(now.minusDays(2L)).endDate(now.plusDays(2L)).build());
         //When
-        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event);
+        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event, now.plusDays(5L));
         //Then
         assertEquals(1, periodHints.size());
         assertEquals(now.plusDays(3L), periodHints.get(0).getStartDate());
@@ -89,7 +88,7 @@ class PeriodFacadeTest {
         initPeriodHintsTests();
         periodDTOS.add(PeriodDTO.builder().startDate(now.plusDays(2L)).endDate(now.plusDays(3L)).build());
         //When
-        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event);
+        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event, now.plusDays(5L));
         //Then
         assertEquals(2, periodHints.size());
         assertEquals(now, periodHints.get(0).getStartDate());
@@ -105,7 +104,7 @@ class PeriodFacadeTest {
         periodDTOS.add(PeriodDTO.builder().startDate(now.plusDays(1L)).endDate(now.plusDays(2L)).build());
         periodDTOS.add(PeriodDTO.builder().startDate(now.plusDays(3L)).endDate(now.plusDays(3L)).build());
         //When
-        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event);
+        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event, now.plusDays(5L));
         //Then
         assertEquals(2, periodHints.size());
         assertEquals(now, periodHints.get(0).getStartDate());
@@ -121,7 +120,7 @@ class PeriodFacadeTest {
         periodDTOS.add(PeriodDTO.builder().startDate(now.minusDays(1L)).endDate(now.plusDays(2L)).build());
         periodDTOS.add(PeriodDTO.builder().startDate(now.plusDays(4L)).endDate(now.plusDays(4L)).build());
         //When
-        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event);
+        List<PeriodDTO> periodHints = periodFacade.getPeriodHints(event, now.plusDays(5L));
         //Then
         assertEquals(2, periodHints.size());
         assertEquals(now.plusDays(3), periodHints.get(0).getStartDate());
@@ -180,17 +179,5 @@ class PeriodFacadeTest {
                 () -> periodFacade.save(periodDTO));
         //Then
         assertEquals("Start date must be before end date", businessException.getMessage());
-    }
-
-    @Test
-    void createPeriodAfterEventStartDate() {
-        //Given
-        when(event.getStartDate()).thenReturn(now.plusDays(5L));
-        PeriodDTO periodDTO = PeriodDTO.builder().name("Test1").startDate(now.plusDays(7L)).endDate(now.plusDays(8L)).simpleEventEntity(event).build();
-        //When
-        BusinessException businessException = assertThrows(BusinessException.class,
-                () -> periodFacade.save(periodDTO));
-        //Then
-        assertEquals("New event period could not finish after event start date", businessException.getMessage());
     }
 }

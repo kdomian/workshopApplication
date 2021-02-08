@@ -51,7 +51,7 @@ class Event {
                 && this.startDate.isBefore(this.endDate);
     }
 
-    public SimpleEventEntity toSimpleEventEnityt() {
-        return new SimpleEventEntity(id, name, startDate);
+    public SimpleEventEntity toSimpleEventEntity() {
+        return new SimpleEventEntity(id);
     }
 }

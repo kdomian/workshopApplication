@@ -59,21 +59,26 @@ public class EventFacade {
         eventCommandRepository.deleteById(id);
     }
 
-    public PeriodDTO addPeriodToEvent(Long eventId, @Valid PeriodDTO periodDTO) {
-        periodDTO.setSimpleEventEntity(getEvent(eventId).toSimpleEventEnityt());
+    public PeriodDTO addPeriodToEvent(PeriodDTO periodDTO) {
+        Event event = getEvent(periodDTO.getSimpleEventEntity().getId());
+        if (periodDTO.getEndDate().isAfter(event.getStartDate())) {
+            throw new BusinessException("New event period could not finish after event start date");
+        }
+        periodDTO.setSimpleEventEntity(event.toSimpleEventEntity());
         return periodFacade.save(periodDTO);
     }
 
     public void deletePeriodFromEvent(Long eventId, PeriodDTO periodDTO) {
-        periodDTO.setSimpleEventEntity(getEvent(eventId).toSimpleEventEnityt());
+        periodDTO.setSimpleEventEntity(getEvent(eventId).toSimpleEventEntity());
         periodFacade.delete(periodDTO);
     }
 
     public List<PeriodDTO> getEventPeriods(Long eventId) {
-        return periodFacade.getPeriodsByEventId(getEvent(eventId).toSimpleEventEnityt());
+        return periodFacade.getPeriodsByEventId(getEvent(eventId).toSimpleEventEntity());
     }
 
     public List<PeriodDTO> getPeriodHints(Long eventId) {
-        return periodFacade.getPeriodHints(getEvent((eventId)).toSimpleEventEnityt());
+        Event event = getEvent((eventId));
+        return periodFacade.getPeriodHints(event.toSimpleEventEntity(), event.getStartDate());
     }
 }

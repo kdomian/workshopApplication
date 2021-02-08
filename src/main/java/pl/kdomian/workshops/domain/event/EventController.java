@@ -51,11 +51,11 @@ class EventController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/addPeriodToEvent")
-    ResponseEntity<PeriodDTO> addPeriodToEvent(@PathVariable Long id, @RequestBody @Valid PeriodDTO periodDTO) {
+    @PostMapping("/addPeriodToEvent")
+    ResponseEntity<PeriodDTO> addPeriodToEvent(@RequestBody @Valid PeriodDTO periodDTO) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(eventFacade.addPeriodToEvent(id, periodDTO));
+                .body(eventFacade.addPeriodToEvent(periodDTO));
     }
 
     @GetMapping("/{id}/getEventPeriods")

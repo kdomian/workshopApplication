@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.kdomian.workshops.domain.event.dto.SimpleEventEntity;
 import pl.kdomian.workshops.domain.period.dto.PeriodDTO;
-import pl.kdomian.workshops.exceptions.BusinessException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,9 +19,6 @@ public class PeriodFacade {
     private final PeriodFactory periodFactory;
 
     public PeriodDTO save(PeriodDTO periodDTO) {
-        if (periodDTO.getEndDate().isAfter(periodDTO.getSimpleEventEntity().getStartDate())) {
-            throw new BusinessException("New event period could not finish after event start date");
-        }
         Period newPeriod = periodFactory.from(periodDTO);
         newPeriod.validateStartEndDatePeriod();
         periodRepository.findAllBySimpleEventEntity(newPeriod.getSimpleEventEntity()).stream()
@@ -39,12 +35,12 @@ public class PeriodFacade {
         return periodRepository.findAllBySimpleEventEntity(simpleEventEntity).stream().map(Period::toDto).collect(Collectors.toList());
     }
 
-    public List<PeriodDTO> getPeriodHints(SimpleEventEntity event) {
+    public List<PeriodDTO> getPeriodHints(SimpleEventEntity event, LocalDate eventStartDate) {
         List<PeriodDTO> periodHintsList = new ArrayList<>();
         List<PeriodDTO> periodDTOS = getActualAndFuturePeriodsForEvent(event);
 
         if (periodDTOS.isEmpty()) {
-            periodHintsList.add(createNewPeriodHints(LocalDate.now(), event.getStartDate(), event.getStartDate()));
+            periodHintsList.add(createNewPeriodHints(LocalDate.now(), eventStartDate, eventStartDate));
             return periodHintsList;
         }
 
@@ -56,15 +52,15 @@ public class PeriodFacade {
                 } else {
                     tempPeriod.setEndDate(periodDTO.getStartDate().minusDays(1L));
                     periodHintsList.add(tempPeriod);
-                    tempPeriod = createNewPeriodHints(periodDTO.getEndDate().plusDays(1L), null, event.getStartDate());
+                    tempPeriod = createNewPeriodHints(periodDTO.getEndDate().plusDays(1L), null, eventStartDate);
                 }
             } else {
                 if (LocalDate.now().isBefore(periodDTO.getStartDate()))
-                    periodHintsList.add(createNewPeriodHints(LocalDate.now(), periodDTO.getStartDate().minusDays(1L), event.getStartDate()));
-                tempPeriod = createNewPeriodHints(periodDTO.getEndDate().plusDays(1L), null, event.getStartDate());
+                    periodHintsList.add(createNewPeriodHints(LocalDate.now(), periodDTO.getStartDate().minusDays(1L), eventStartDate));
+                tempPeriod = createNewPeriodHints(periodDTO.getEndDate().plusDays(1L), null, eventStartDate);
             }
         if (tempPeriod != null) {
-            tempPeriod.setEndDate(event.getStartDate());
+            tempPeriod.setEndDate(eventStartDate);
             periodHintsList.add(tempPeriod);
         }
 
