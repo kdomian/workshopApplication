@@ -17,4 +17,11 @@ public class TariffDTO {
     private SimpleTicketEntity simpleTicketEntity;
     @NotNull
     private Double price;
+
+    public TariffDTO(Long id, @NotNull SimplePeriodEntity simplePeriodEntity, @NotNull SimpleTicketEntity simpleTicketEntity, @NotNull Double price) {
+        this.id = id;
+        this.simplePeriodEntity = simplePeriodEntity;
+        this.simpleTicketEntity = simpleTicketEntity;
+        this.price = price;
+    }
 }

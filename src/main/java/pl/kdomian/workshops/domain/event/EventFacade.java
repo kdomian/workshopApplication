@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class EventFacade {
 
     private final EventCommandRepository eventCommandRepository;
+    private final EventQueryRepository eventQueryRepository;
     private final EventFactory eventFactory;
     private final PeriodFacade periodFacade;
 
@@ -28,7 +29,7 @@ public class EventFacade {
     }
 
     public List<EventDTO> getEvents() {
-        return eventCommandRepository.findAll().stream()
+        return eventQueryRepository.findAll().stream()
                 .map(Event::toDto)
                 .collect(Collectors.toList());
     }
@@ -59,19 +60,6 @@ public class EventFacade {
         eventCommandRepository.deleteById(id);
     }
 
-    public PeriodDTO addPeriodToEvent(PeriodDTO periodDTO) {
-        Event event = getEvent(periodDTO.getSimpleEventEntity().getId());
-        if (periodDTO.getEndDate().isAfter(event.getStartDate())) {
-            throw new BusinessException("New event period could not finish after event start date");
-        }
-        periodDTO.setSimpleEventEntity(event.toSimpleEventEntity());
-        return periodFacade.save(periodDTO);
-    }
-
-    public void deletePeriodFromEvent(Long eventId, PeriodDTO periodDTO) {
-        periodDTO.setSimpleEventEntity(getEvent(eventId).toSimpleEventEntity());
-        periodFacade.delete(periodDTO);
-    }
 
     public List<PeriodDTO> getEventPeriods(Long eventId) {
         return periodFacade.getPeriodsByEventId(getEvent(eventId).toSimpleEventEntity());

@@ -6,6 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.kdomian.workshops.domain.event.EventFacade;
+import pl.kdomian.workshops.domain.event.EventQueryRepository;
+import pl.kdomian.workshops.domain.event.dto.EventDTO;
 import pl.kdomian.workshops.domain.event.dto.SimpleEventEntity;
 import pl.kdomian.workshops.domain.period.dto.PeriodDTO;
 import pl.kdomian.workshops.exceptions.BusinessException;
@@ -16,6 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -31,13 +35,18 @@ class PeriodFacadeTest {
     private LocalDate now;
     private List<PeriodDTO> periodDTOS;
     private PeriodFacade periodFacade;
+    @Mock
+    EventFacade eventFacade;
+    @Mock
+    private EventQueryRepository eventQueryRepository;
 
     @BeforeEach
     void before() {
         now = LocalDate.now();
         periodDTOS = new ArrayList<>();
         periodFactory = new PeriodFactory();
-        periodFacade = Mockito.spy(new PeriodFacade(periodRepository, periodFactory));
+        PeriodValidator periodValidator = new PeriodValidator(eventQueryRepository, periodRepository);
+        periodFacade = Mockito.spy(new PeriodFacade(periodRepository, periodFactory, periodValidator));
 
 
     }
@@ -139,6 +148,7 @@ class PeriodFacadeTest {
         period.setEndDate(now.plusDays(2L));
         periods.add(period);
         when(periodRepository.findAllBySimpleEventEntity(event)).thenReturn(periods);
+        when(eventFacade.getEventDto(any())).thenReturn(EventDTO.builder().startDate(now.plusDays(5L)).build());
         PeriodDTO periodDTO = PeriodDTO.builder().name("Test1").startDate(now).endDate(now).simpleEventEntity(event).build();
         //When
         BusinessException businessException = assertThrows(BusinessException.class,
@@ -157,6 +167,7 @@ class PeriodFacadeTest {
         period.setEndDate(now.plusDays(4L));
         periods.add(period);
         when(periodRepository.findAllBySimpleEventEntity(event)).thenReturn(periods);
+        when(eventFacade.getEventDto(any())).thenReturn(EventDTO.builder().startDate(now.plusDays(5L)).build());
         PeriodDTO periodDTO = PeriodDTO.builder()
                 .name("Test2")
                 .startDate(now)
@@ -174,6 +185,7 @@ class PeriodFacadeTest {
     void createPeriodWhenStartDateAfterEndDate() {
         //Given
         PeriodDTO periodDTO = PeriodDTO.builder().name("Test1").startDate(now.plusDays(2L)).endDate(now).simpleEventEntity(event).build();
+        when(eventFacade.getEventDto(any())).thenReturn(EventDTO.builder().startDate(now.plusDays(5L)).build());
         //When
         BusinessException businessException = assertThrows(BusinessException.class,
                 () -> periodFacade.save(periodDTO));

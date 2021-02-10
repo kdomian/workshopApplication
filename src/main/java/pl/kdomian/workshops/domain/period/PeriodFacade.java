@@ -17,14 +17,12 @@ public class PeriodFacade {
 
     private final PeriodRepository periodRepository;
     private final PeriodFactory periodFactory;
+    private final PeriodValidator periodValidator;
 
     public PeriodDTO save(PeriodDTO periodDTO) {
-        Period newPeriod = periodFactory.from(periodDTO);
-        newPeriod.validateStartEndDatePeriod();
-        periodRepository.findAllBySimpleEventEntity(newPeriod.getSimpleEventEntity()).stream()
-                .noneMatch(period -> !period.validateCorectPeriodSeparable(newPeriod) || !period.validatePeriodName(newPeriod));
-        return periodRepository.save(newPeriod).toDto();
-
+        periodValidator.validation(periodDTO);
+        Period period = periodFactory.from(periodDTO);
+        return periodRepository.save(period).toDto();
     }
 
     public void delete(PeriodDTO periodDTO) {

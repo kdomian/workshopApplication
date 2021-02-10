@@ -1,8 +1,14 @@
 package pl.kdomian.workshops.domain.event;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.Repository;
 
-@Repository
-interface EventCommandRepository extends JpaRepository<Event, Long> {
+import java.util.Optional;
+
+interface EventCommandRepository extends Repository<Event, Long> {
+
+    Optional<Event> findById(Long eventId);
+
+    Event save(Event event);
+
+    void deleteById(Long id);
 }
