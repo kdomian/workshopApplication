@@ -15,7 +15,7 @@ import java.util.Optional;
 class PeriodValidator {
 
     private final EventQueryRepository eventQueryRepository;
-    private final PeriodRepository periodRepository;
+    private final PeriodQueryRepository periodQueryRepository;
 
     void validation(PeriodDTO periodDTO) {
         validateEndDateAfterEventStartDate(periodDTO);
@@ -24,14 +24,14 @@ class PeriodValidator {
     }
 
     private void validatePeriodSeparable(PeriodDTO periodDTO) {
-        periodRepository.findAllBySimpleEventEntity(periodDTO.getSimpleEventEntity()).stream()
-                .forEach(period -> {
-                    validatePeriodCollision(periodDTO, period);
-                    validatePeriodName(periodDTO, period);
+        periodQueryRepository.findAllBySimpleEventEntity(periodDTO.getSimpleEventEntity()).stream()
+                .forEach(persistPeriod -> {
+                    validatePeriodCollision(periodDTO, persistPeriod);
+                    validatePeriodName(periodDTO, persistPeriod);
                 });
     }
 
-    void validatePeriodCollision(PeriodDTO newPeriod, Period persistsPeriod) {
+    void validatePeriodCollision(PeriodDTO newPeriod, PeriodDTO persistsPeriod) {
         LocalDate startDate = newPeriod.getStartDate();
         LocalDate endDate = newPeriod.getEndDate();
         LocalDate startDatePersist = persistsPeriod.getStartDate();
@@ -46,7 +46,7 @@ class PeriodValidator {
             throw new BusinessException("There is collision with new period on event");
     }
 
-    private void validatePeriodName(PeriodDTO newPeriod, Period persistsPeriod) {
+    private void validatePeriodName(PeriodDTO newPeriod, PeriodDTO persistsPeriod) {
         if (persistsPeriod.getName().equals(newPeriod.getName()))
             throw new BusinessException("Couldn't be the same period name on one event");
     }

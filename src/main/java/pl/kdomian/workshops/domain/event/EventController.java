@@ -87,6 +87,6 @@ class EventController {
     ResponseEntity<List<PeriodDTO>> getActivePeriods(@PathVariable Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntityAndEndDateAfter(new SimpleEventEntity(id), LocalDate.now())));
+                .body(new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntityAndEndDateAfterOrderByStartDateDesc(new SimpleEventEntity(id), LocalDate.now())));
     }
 }

@@ -15,5 +15,5 @@ public interface PeriodQueryRepository extends Repository<Period, Long> {
 
     Optional<PeriodDTO> findBySimpleEventEntityAndStartDateBeforeAndEndDateAfter(SimpleEventEntity simpleEventEntity, LocalDate now1, LocalDate now2);
 
-    Set<PeriodDTO> findAllBySimpleEventEntityAndEndDateAfter(SimpleEventEntity simpleEventEntity, LocalDate now);
+    Set<PeriodDTO> findAllBySimpleEventEntityAndEndDateAfterOrderByStartDateDesc(SimpleEventEntity simpleEventEntity, LocalDate now);
 }

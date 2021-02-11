@@ -35,7 +35,7 @@ class EventControllerTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         EventFactory eventFactory = new EventFactory();
-        EventFacade eventFacade = new EventFacade(eventCommandRepository, eventFactory, periodFacade);
+        EventFacade eventFacade = new EventFacade(eventCommandRepository, eventQueryRepository, eventFactory, periodFacade);
         EventController eventController = new EventController(eventFacade, eventQueryRepository, periodQueryRepository);
         mvc = MockMvcBuilders.standaloneSetup(eventController)
                 .setControllerAdvice(new ExceptionAdviceHandler())

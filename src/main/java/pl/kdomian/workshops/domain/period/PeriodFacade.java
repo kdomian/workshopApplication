@@ -2,43 +2,43 @@ package pl.kdomian.workshops.domain.period;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.kdomian.workshops.domain.event.dto.EventDTO;
 import pl.kdomian.workshops.domain.event.dto.SimpleEventEntity;
 import pl.kdomian.workshops.domain.period.dto.PeriodDTO;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PeriodFacade {
 
-    private final PeriodRepository periodRepository;
+    private final PeriodCommandRepository periodCommandRepository;
+    private final PeriodQueryRepository periodQueryRepository;
     private final PeriodFactory periodFactory;
     private final PeriodValidator periodValidator;
 
     public PeriodDTO save(PeriodDTO periodDTO) {
         periodValidator.validation(periodDTO);
         Period period = periodFactory.from(periodDTO);
-        return periodRepository.save(period).toDto();
+        return periodCommandRepository.save(period).toDto();
     }
 
     public void delete(PeriodDTO periodDTO) {
-        periodRepository.delete(periodFactory.from(periodDTO));
+        periodCommandRepository.delete(periodFactory.from(periodDTO));
     }
 
     public List<PeriodDTO> getPeriodsByEventId(SimpleEventEntity simpleEventEntity) {
-        return periodRepository.findAllBySimpleEventEntity(simpleEventEntity).stream().map(Period::toDto).collect(Collectors.toList());
+        return new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntity(simpleEventEntity));
     }
 
-    public List<PeriodDTO> getPeriodHints(SimpleEventEntity event, LocalDate eventStartDate) {
+    public List<PeriodDTO> getPeriodHints(EventDTO eventDTO) {
         List<PeriodDTO> periodHintsList = new ArrayList<>();
-        List<PeriodDTO> periodDTOS = getActualAndFuturePeriodsForEvent(event);
+        List<PeriodDTO> periodDTOS = new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntityAndEndDateAfterOrderByStartDateDesc(new SimpleEventEntity(eventDTO.getId()), LocalDate.now()));
 
         if (periodDTOS.isEmpty()) {
-            periodHintsList.add(createNewPeriodHints(LocalDate.now(), eventStartDate, eventStartDate));
+            periodHintsList.add(createNewPeriodHints(LocalDate.now(), eventDTO.getStartDate(), eventDTO.getStartDate()));
             return periodHintsList;
         }
 
@@ -50,26 +50,19 @@ public class PeriodFacade {
                 } else {
                     tempPeriod.setEndDate(periodDTO.getStartDate().minusDays(1L));
                     periodHintsList.add(tempPeriod);
-                    tempPeriod = createNewPeriodHints(periodDTO.getEndDate().plusDays(1L), null, eventStartDate);
+                    tempPeriod = createNewPeriodHints(periodDTO.getEndDate().plusDays(1L), null, eventDTO.getStartDate());
                 }
             } else {
                 if (LocalDate.now().isBefore(periodDTO.getStartDate()))
-                    periodHintsList.add(createNewPeriodHints(LocalDate.now(), periodDTO.getStartDate().minusDays(1L), eventStartDate));
-                tempPeriod = createNewPeriodHints(periodDTO.getEndDate().plusDays(1L), null, eventStartDate);
+                    periodHintsList.add(createNewPeriodHints(LocalDate.now(), periodDTO.getStartDate().minusDays(1L), eventDTO.getStartDate()));
+                tempPeriod = createNewPeriodHints(periodDTO.getEndDate().plusDays(1L), null, eventDTO.getStartDate());
             }
         if (tempPeriod != null) {
-            tempPeriod.setEndDate(eventStartDate);
+            tempPeriod.setEndDate(eventDTO.getStartDate());
             periodHintsList.add(tempPeriod);
         }
 
         return periodHintsList;
-    }
-
-    private List<PeriodDTO> getActualAndFuturePeriodsForEvent(SimpleEventEntity event) {
-        return getPeriodsByEventId(event).stream()
-                .filter(periodDTO -> LocalDate.now().isBefore(periodDTO.getEndDate()))
-                .sorted(Comparator.comparing(PeriodDTO::getStartDate))
-                .collect(Collectors.toList());
     }
 
     private PeriodDTO createNewPeriodHints(LocalDate startDate, LocalDate endDate, LocalDate eventStartDate) {

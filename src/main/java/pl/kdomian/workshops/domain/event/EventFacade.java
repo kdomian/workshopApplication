@@ -18,13 +18,9 @@ import java.util.List;
 public class EventFacade {
 
     private final EventCommandRepository eventCommandRepository;
+    private final EventQueryRepository eventQueryRepository;
     private final EventFactory eventFactory;
     private final PeriodFacade periodFacade;
-
-    private Event getEvent(Long eventId) {
-        return eventCommandRepository.findById(eventId)
-                .orElseThrow(() -> new ElementNotFoundException(Entities.EVENT, eventId));
-    }
 
     public EventDTO createEvent(@Valid EventDTO eventDTO) {
         var event = eventFactory.from(eventDTO);
@@ -36,7 +32,7 @@ public class EventFacade {
 
     @Transactional
     public Event editEvent(Long eventId, EventDTO eventDTO) {
-        var editedEvent = getEvent(eventId);
+        Event editedEvent = eventCommandRepository.findById(eventId).orElseThrow(() -> new ElementNotFoundException(Entities.EVENT, eventId));
         editedEvent.setName(eventDTO.getName());
         editedEvent.setStartDate(eventDTO.getStartDate());
         editedEvent.setEndDate(eventDTO.getEndDate());
@@ -48,13 +44,8 @@ public class EventFacade {
         eventCommandRepository.deleteById(id);
     }
 
-
-    public List<PeriodDTO> getEventPeriods(Long eventId) {
-        return periodFacade.getPeriodsByEventId(getEvent(eventId).toSimpleEventEntity());
-    }
-
     public List<PeriodDTO> getPeriodHints(Long eventId) {
-        Event event = getEvent((eventId));
-        return periodFacade.getPeriodHints(event.toSimpleEventEntity(), event.getStartDate());
+        EventDTO eventDTO = eventQueryRepository.findDtoById(eventId).orElseThrow(() -> new ElementNotFoundException(Entities.EVENT, eventId));
+        return periodFacade.getPeriodHints(eventDTO);
     }
 }
