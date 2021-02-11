@@ -82,4 +82,11 @@ class EventController {
                 .status(HttpStatus.OK)
                 .body(eventFacade.getPeriodHints(id));
     }
+
+    @GetMapping("{id}/getActivePeriods")
+    ResponseEntity<List<PeriodDTO>> getActivePeriods(@PathVariable Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntityAndEndDateAfter(new SimpleEventEntity(id), LocalDate.now())));
+    }
 }

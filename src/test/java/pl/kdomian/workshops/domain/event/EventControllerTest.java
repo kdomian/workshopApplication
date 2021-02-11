@@ -26,7 +26,6 @@ class EventControllerTest {
     private EventCommandRepository eventCommandRepository;
     @Mock
     private EventQueryRepository eventQueryRepository;
-    private EventFactory eventFactory;
     @Mock
     private PeriodFacade periodFacade;
     @Mock
@@ -35,7 +34,7 @@ class EventControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        eventFactory = new EventFactory();
+        EventFactory eventFactory = new EventFactory();
         EventFacade eventFacade = new EventFacade(eventCommandRepository, eventFactory, periodFacade);
         EventController eventController = new EventController(eventFacade, eventQueryRepository, periodQueryRepository);
         mvc = MockMvcBuilders.standaloneSetup(eventController)
