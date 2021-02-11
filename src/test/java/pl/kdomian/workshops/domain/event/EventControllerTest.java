@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.kdomian.workshops.domain.event.dto.EventDTO;
 import pl.kdomian.workshops.domain.period.PeriodFacade;
+import pl.kdomian.workshops.domain.period.PeriodQueryRepository;
 import pl.kdomian.workshops.exceptions.ExceptionAdviceHandler;
 
 import java.time.LocalDate;
@@ -28,13 +29,15 @@ class EventControllerTest {
     private EventFactory eventFactory;
     @Mock
     private PeriodFacade periodFacade;
+    @Mock
+    private PeriodQueryRepository periodQueryRepository;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         eventFactory = new EventFactory();
-        EventFacade eventFacade = new EventFacade(eventCommandRepository, eventQueryRepository, eventFactory, periodFacade);
-        EventController eventController = new EventController(eventFacade);
+        EventFacade eventFacade = new EventFacade(eventCommandRepository, eventFactory, periodFacade);
+        EventController eventController = new EventController(eventFacade, eventQueryRepository, periodQueryRepository);
         mvc = MockMvcBuilders.standaloneSetup(eventController)
                 .setControllerAdvice(new ExceptionAdviceHandler())
                 .build();
@@ -50,8 +53,8 @@ class EventControllerTest {
     @Test
     public void getEventByIdWhenExist() throws Exception {
         //Given
-        Event event = eventFactory.from(EventDTO.builder().name("Event name").startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(1L)).build());
-        when(eventCommandRepository.findById(1L)).thenReturn(Optional.ofNullable(event));
+        EventDTO eventDTO = EventDTO.builder().name("Event name").startDate(LocalDate.now()).endDate(LocalDate.now().plusDays(1L)).build();
+        when(eventQueryRepository.findDtoById(1L)).thenReturn(Optional.ofNullable(eventDTO));
         //When
         //Then
         mvc.perform(get("/events/1"))

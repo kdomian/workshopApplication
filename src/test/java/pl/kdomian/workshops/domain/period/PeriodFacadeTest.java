@@ -16,6 +16,7 @@ import pl.kdomian.workshops.exceptions.BusinessException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -148,7 +149,7 @@ class PeriodFacadeTest {
         period.setEndDate(now.plusDays(2L));
         periods.add(period);
         when(periodRepository.findAllBySimpleEventEntity(event)).thenReturn(periods);
-        when(eventFacade.getEventDto(any())).thenReturn(EventDTO.builder().startDate(now.plusDays(5L)).build());
+        when(eventQueryRepository.findDtoById(any())).thenReturn(Optional.ofNullable(EventDTO.builder().startDate(now.plusDays(5L)).build()));
         PeriodDTO periodDTO = PeriodDTO.builder().name("Test1").startDate(now).endDate(now).simpleEventEntity(event).build();
         //When
         BusinessException businessException = assertThrows(BusinessException.class,
@@ -167,7 +168,7 @@ class PeriodFacadeTest {
         period.setEndDate(now.plusDays(4L));
         periods.add(period);
         when(periodRepository.findAllBySimpleEventEntity(event)).thenReturn(periods);
-        when(eventFacade.getEventDto(any())).thenReturn(EventDTO.builder().startDate(now.plusDays(5L)).build());
+        when(eventQueryRepository.findDtoById(any())).thenReturn(Optional.ofNullable(EventDTO.builder().startDate(now.plusDays(5L)).build()));
         PeriodDTO periodDTO = PeriodDTO.builder()
                 .name("Test2")
                 .startDate(now)
@@ -185,7 +186,7 @@ class PeriodFacadeTest {
     void createPeriodWhenStartDateAfterEndDate() {
         //Given
         PeriodDTO periodDTO = PeriodDTO.builder().name("Test1").startDate(now.plusDays(2L)).endDate(now).simpleEventEntity(event).build();
-        when(eventFacade.getEventDto(any())).thenReturn(EventDTO.builder().startDate(now.plusDays(5L)).build());
+        when(eventQueryRepository.findDtoById(any())).thenReturn(Optional.ofNullable(EventDTO.builder().startDate(now.plusDays(5L)).build()));
         //When
         BusinessException businessException = assertThrows(BusinessException.class,
                 () -> periodFacade.save(periodDTO));

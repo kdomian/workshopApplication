@@ -4,10 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.kdomian.workshops.Entities;
 import pl.kdomian.workshops.domain.event.dto.EventDTO;
+import pl.kdomian.workshops.domain.event.dto.SimpleEventEntity;
+import pl.kdomian.workshops.domain.period.PeriodQueryRepository;
 import pl.kdomian.workshops.domain.period.dto.PeriodDTO;
+import pl.kdomian.workshops.exceptions.BusinessException;
+import pl.kdomian.workshops.exceptions.ElementNotFoundException;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -16,12 +23,14 @@ import java.util.List;
 class EventController {
 
     private final EventFacade eventFacade;
+    private final EventQueryRepository eventQueryRepository;
+    private final PeriodQueryRepository periodQueryRepository;
 
     @GetMapping("")
     ResponseEntity<List<EventDTO>> getEventsList() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(eventFacade.getEvents());
+                .body(new ArrayList<>(eventQueryRepository.findBy()));
     }
 
     @PostMapping("")
@@ -35,7 +44,7 @@ class EventController {
     ResponseEntity<EventDTO> getEvent(@PathVariable Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(eventFacade.getEventDto(id));
+                .body(eventQueryRepository.findDtoById(id).orElseThrow(() -> new ElementNotFoundException(Entities.EVENT, id)));
     }
 
     @PutMapping("/{id}")
@@ -56,7 +65,15 @@ class EventController {
     ResponseEntity<List<PeriodDTO>> getEventPeriods(@PathVariable Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(eventFacade.getEventPeriods(id));
+                .body(new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntity(new SimpleEventEntity(id))));
+    }
+
+    @GetMapping("/{id}/getCurrentEventPeriod")
+    ResponseEntity<PeriodDTO> getCurrentEventPeriod(@PathVariable Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(periodQueryRepository.findBySimpleEventEntityAndStartDateBeforeAndEndDateAfter(new SimpleEventEntity(id), LocalDate.now(), LocalDate.now())
+                        .orElseThrow(() -> new BusinessException("Couldn't find current period for Event with id: " + id)));
     }
 
     @GetMapping("/{id}/getPeriodHits")

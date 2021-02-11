@@ -10,11 +10,9 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 public class EventDTO {
-
     private Long id;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean isActive;
-
 }

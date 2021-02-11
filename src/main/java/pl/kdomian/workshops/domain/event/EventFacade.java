@@ -12,30 +12,18 @@ import pl.kdomian.workshops.exceptions.ElementNotFoundException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class EventFacade {
 
     private final EventCommandRepository eventCommandRepository;
-    private final EventQueryRepository eventQueryRepository;
     private final EventFactory eventFactory;
     private final PeriodFacade periodFacade;
 
     private Event getEvent(Long eventId) {
         return eventCommandRepository.findById(eventId)
                 .orElseThrow(() -> new ElementNotFoundException(Entities.EVENT, eventId));
-    }
-
-    public List<EventDTO> getEvents() {
-        return eventQueryRepository.findAll().stream()
-                .map(Event::toDto)
-                .collect(Collectors.toList());
-    }
-
-    public EventDTO getEventDto(Long eventId) {
-        return getEvent(eventId).toDto();
     }
 
     public EventDTO createEvent(@Valid EventDTO eventDTO) {

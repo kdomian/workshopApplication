@@ -1,5 +1,6 @@
 package pl.kdomian.workshops.domain.period.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import pl.kdomian.workshops.domain.event.dto.SimpleEventEntity;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class PeriodDTO {
     private Long id;
     @NotEmpty(message = "Period name will be not null")
