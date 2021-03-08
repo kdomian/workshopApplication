@@ -144,7 +144,7 @@ class PeriodFacadeTest {
     void createPeriodWhenThereIsPeriodWithSameName() {
         //Given
         Set<PeriodDTO> periods = Collections.singleton(PeriodDTO.builder().name("Test1").startDate(now.plusDays(2L)).endDate(now.plusDays(2L)).build());
-        when(periodQueryRepository.findAllBySimpleEventEntity(event)).thenReturn(periods);
+        when(periodQueryRepository.findAllBySimpleEventEntityOrderByStartDate(event)).thenReturn(periods);
         when(eventQueryRepository.findDtoById(any())).thenReturn(Optional.ofNullable(EventDTO.builder().startDate(now.plusDays(5L)).build()));
         PeriodDTO periodDTO = PeriodDTO.builder().name("Test1").startDate(now).endDate(now).simpleEventEntity(event).build();
         //When
@@ -158,7 +158,7 @@ class PeriodFacadeTest {
     void createPeriodWhenThereIsCollisions() {
         //Given
         Set<PeriodDTO> periods = Collections.singleton(PeriodDTO.builder().name("Test1").startDate(now.plusDays(2L)).endDate(now.plusDays(4L)).build());
-        when(periodQueryRepository.findAllBySimpleEventEntity(event)).thenReturn(periods);
+        when(periodQueryRepository.findAllBySimpleEventEntityOrderByStartDate(event)).thenReturn(periods);
         when(eventQueryRepository.findDtoById(any())).thenReturn(Optional.ofNullable(EventDTO.builder().startDate(now.plusDays(5L)).build()));
         PeriodDTO newPeriodDTO = PeriodDTO.builder()
                 .name("Test2")

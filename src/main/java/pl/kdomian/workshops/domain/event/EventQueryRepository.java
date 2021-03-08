@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface EventQueryRepository extends Repository<Event, Long> {
 
-    Set<EventDTO> findBy();
+    Set<EventDTO> findByOrderByStartDate();
 
     Optional<EventDTO> findDtoById(Long id);
 }

@@ -24,7 +24,7 @@ class PeriodValidator {
     }
 
     private void validatePeriodSeparable(PeriodDTO periodDTO) {
-        periodQueryRepository.findAllBySimpleEventEntity(periodDTO.getSimpleEventEntity()).stream()
+        periodQueryRepository.findAllBySimpleEventEntityOrderByStartDate(periodDTO.getSimpleEventEntity()).stream()
                 .forEach(persistPeriod -> {
                     validatePeriodCollision(periodDTO, persistPeriod);
                     validatePeriodName(periodDTO, persistPeriod);

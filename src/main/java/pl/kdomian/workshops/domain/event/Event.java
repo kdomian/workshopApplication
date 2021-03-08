@@ -48,7 +48,7 @@ class Event {
     boolean isValidStartAndEndDate() {
         return this.startDate != null
                 && this.endDate != null
-                && this.startDate.isBefore(this.endDate);
+                && (this.startDate.isBefore(this.endDate) || this.startDate.equals(this.endDate));
     }
 
     public SimpleEventEntity toSimpleEventEntity() {

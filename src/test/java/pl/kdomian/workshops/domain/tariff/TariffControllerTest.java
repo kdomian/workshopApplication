@@ -12,6 +12,8 @@ class TariffControllerTest {
     MockMvc mvc;
     @Mock
     TariffRepository tariffRepository;
+    @Mock
+    TariffQueryRepository tariffQueryRepository;
     TariffFactory tariffFactory;
 
 
@@ -20,7 +22,7 @@ class TariffControllerTest {
         tariffFactory = new TariffFactory();
         MockitoAnnotations.initMocks(this);
         TariffFacade tariffFacade = new TariffFacade(tariffRepository, tariffFactory);
-        TariffController tariffController = new TariffController(tariffFacade);
+        TariffController tariffController = new TariffController(tariffFacade, tariffQueryRepository);
         mvc = MockMvcBuilders.standaloneSetup(tariffController)
                 .setControllerAdvice(new ExceptionAdviceHandler())
                 .build();

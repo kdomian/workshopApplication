@@ -11,7 +11,7 @@ import java.util.Set;
 
 public interface PeriodQueryRepository extends Repository<Period, Long> {
 
-    Set<PeriodDTO> findAllBySimpleEventEntity(SimpleEventEntity simpleEventEntity);
+    Set<PeriodDTO> findAllBySimpleEventEntityOrderByStartDate(SimpleEventEntity simpleEventEntity);
 
     Optional<PeriodDTO> findBySimpleEventEntityAndStartDateBeforeAndEndDateAfter(SimpleEventEntity simpleEventEntity, LocalDate now1, LocalDate now2);
 

@@ -4,17 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.kdomian.workshops.domain.period.dto.SimplePeriodEntity;
 import pl.kdomian.workshops.domain.tariff.dto.TariffDTO;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tariff")
+@RequestMapping("/tariffs")
 @RequiredArgsConstructor
 class TariffController {
 
     private final TariffFacade tariffFacade;
+    private final TariffQueryRepository tariffQueryRepository;
 
     @GetMapping("/")
     ResponseEntity<List<TariffDTO>> getTariffs() {
@@ -35,6 +38,13 @@ class TariffController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(tariffFacade.createTariff(tariffDTO));
+    }
+
+    @GetMapping("/getPeriodTariffs/{id}")
+    ResponseEntity<List<TariffDTO>> getPeriodTariffs(@PathVariable Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ArrayList<>(tariffQueryRepository.findAllBySimplePeriodEntity(new SimplePeriodEntity(id))));
     }
 
 

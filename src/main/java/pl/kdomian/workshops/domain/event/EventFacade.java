@@ -48,4 +48,10 @@ public class EventFacade {
         EventDTO eventDTO = eventQueryRepository.findDtoById(eventId).orElseThrow(() -> new ElementNotFoundException(Entities.EVENT, eventId));
         return periodFacade.getPeriodHints(eventDTO);
     }
+
+    public EventDTO activateEvent(Long eventId) {
+        Event editedEvent = eventCommandRepository.findById(eventId).orElseThrow(() -> new ElementNotFoundException(Entities.EVENT, eventId));
+        editedEvent.setIsActive(true);
+        return eventCommandRepository.save(editedEvent).toDto();
+    }
 }

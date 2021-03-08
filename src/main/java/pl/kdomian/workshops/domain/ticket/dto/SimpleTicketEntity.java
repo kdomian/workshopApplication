@@ -15,8 +15,11 @@ public class SimpleTicketEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public SimpleTicketEntity(Long id) {
+    private String name;
+
+    public SimpleTicketEntity(Long id, String name) {
         this.id = id;
+        this.name = name;
     }
 
 }

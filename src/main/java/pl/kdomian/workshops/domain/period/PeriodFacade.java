@@ -30,7 +30,7 @@ public class PeriodFacade {
     }
 
     public List<PeriodDTO> getPeriodsByEventId(SimpleEventEntity simpleEventEntity) {
-        return new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntity(simpleEventEntity));
+        return new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntityOrderByStartDate(simpleEventEntity));
     }
 
     public List<PeriodDTO> getPeriodHints(EventDTO eventDTO) {

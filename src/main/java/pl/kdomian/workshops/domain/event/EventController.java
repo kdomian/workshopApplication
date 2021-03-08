@@ -30,7 +30,7 @@ class EventController {
     ResponseEntity<List<EventDTO>> getEventsList() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ArrayList<>(eventQueryRepository.findBy()));
+                .body(new ArrayList<>(eventQueryRepository.findByOrderByStartDate()));
     }
 
     @PostMapping("")
@@ -60,14 +60,6 @@ class EventController {
         return ResponseEntity.ok().build();
     }
 
-
-    @GetMapping("/{id}/getEventPeriods")
-    ResponseEntity<List<PeriodDTO>> getEventPeriods(@PathVariable Long id) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntity(new SimpleEventEntity(id))));
-    }
-
     @GetMapping("/{id}/getCurrentEventPeriod")
     ResponseEntity<PeriodDTO> getCurrentEventPeriod(@PathVariable Long id) {
         return ResponseEntity
@@ -88,5 +80,12 @@ class EventController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ArrayList<>(periodQueryRepository.findAllBySimpleEventEntityAndEndDateAfterOrderByStartDateDesc(new SimpleEventEntity(id), LocalDate.now())));
+    }
+
+    @GetMapping("/{id}/activate")
+    ResponseEntity<EventDTO> activateEvent(@PathVariable Long id) {
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(eventFacade.activateEvent(id));
     }
 }

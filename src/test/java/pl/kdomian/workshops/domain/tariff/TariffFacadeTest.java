@@ -31,7 +31,7 @@ class TariffFacadeTest {
     void init() {
         tariffFactory = new TariffFactory();
         tariffFacade = new TariffFacade(tariffRepository, tariffFactory);
-        tariffDTOList.add(TariffDTO.builder().simplePeriodEntity(new SimplePeriodEntity(1L)).simpleTicketEntity(new SimpleTicketEntity(1L)).price(20.0).build());
+        tariffDTOList.add(TariffDTO.builder().simplePeriodEntity(new SimplePeriodEntity(1L)).simpleTicketEntity(new SimpleTicketEntity(1L, "Couple")).price(20.0).build());
     }
 
     @Test
@@ -39,7 +39,7 @@ class TariffFacadeTest {
         //Given
         TariffDTO tariffDTO = TariffDTO.builder()
                 .simplePeriodEntity(new SimplePeriodEntity(1L))
-                .simpleTicketEntity(new SimpleTicketEntity(1L))
+                .simpleTicketEntity(new SimpleTicketEntity(1L, "Couple"))
                 .price(20.0)
                 .build();
         when(tariffRepository.findOneFirsBySimplePeriodEntityAndSimpleTicketEntity(any(), any())).thenReturn(Optional.of(tariffFactory.from(tariffDTO)));
@@ -55,7 +55,7 @@ class TariffFacadeTest {
         //Given
         TariffDTO tariffDTO = TariffDTO.builder()
                 .simplePeriodEntity(new SimplePeriodEntity(1L))
-                .simpleTicketEntity(new SimpleTicketEntity(1L))
+                .simpleTicketEntity(new SimpleTicketEntity(1L, "Couple"))
                 .price(20.0)
                 .build();
         Tariff tariff = tariffFactory.from(tariffDTO);
